@@ -10,7 +10,7 @@ mod player;
 mod resources;
 mod shape;
 
-const WINDOW_SIZE_X: i32 = 1024;
+const WINDOW_SIZE_X: i32 = 1056;
 const WINDOW_SIZE_Y: i32 = 800;
 
 enum GameState {
@@ -21,7 +21,7 @@ enum GameState {
 fn window_conf() -> Conf {
     Conf {
         window_title: String::from("Dwarfing"),
-        fullscreen: true,
+        fullscreen: false,
         window_resizable: false,
         window_width: WINDOW_SIZE_X,
         window_height: WINDOW_SIZE_Y,

@@ -2,7 +2,7 @@ use macroquad::prelude::*;
 
 use crate::{block::Block, player::Player, resources::Resources, shape::Shape};
 
-const GRAVITY: f32 = 200.0;
+const GRAVITY: f32 = 500.0;
 const BLOCK_SIZE: f32 = 32.0;
 
 #[derive(Debug, PartialEq)]
@@ -173,30 +173,35 @@ impl Dwarfing {
     }
 
     fn draw_player(&self) {
-        //draw_rectangle(
-        //    self.player.shape.x,
-        //    self.player.shape.y,
-        //    self.player.shape.size.x,
-        //    self.player.shape.size.y,
-        //    self.player.shape.color,
-        //);
+        match self.debug_mode {
+            DebugMode::Enabled => {
+                draw_rectangle(
+                    self.player.shape.x,
+                    self.player.shape.y,
+                    self.player.shape.size.x,
+                    self.player.shape.size.y,
+                    self.player.shape.color,
+                );
+            }
+            DebugMode::Disabled => {
+                let frame = self.player.sprite.frame();
 
-        let frame = self.player.sprite.frame();
-
-        draw_texture_ex(
-            &self.player.texture,
-            self.player.shape.x,
-            self.player.shape.y,
-            WHITE,
-            DrawTextureParams {
-                dest_size: Some(Vec2 {
-                    x: self.player.shape.size.x,
-                    y: self.player.shape.size.y,
-                }),
-                source: Some(frame.source_rect),
-                ..Default::default()
-            },
-        );
+                draw_texture_ex(
+                    &self.player.texture,
+                    self.player.shape.x,
+                    self.player.shape.y,
+                    WHITE,
+                    DrawTextureParams {
+                        dest_size: Some(Vec2 {
+                            x: self.player.shape.size.x,
+                            y: self.player.shape.size.y,
+                        }),
+                        source: Some(frame.source_rect),
+                        ..Default::default()
+                    },
+                );
+            }
+        }
     }
 
     //
