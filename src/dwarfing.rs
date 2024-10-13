@@ -5,6 +5,12 @@ use crate::{block::Block, player::Player, shape::Shape};
 const GRAVITY: f32 = 200.0;
 const BLOCK_SIZE: f32 = 32.0;
 
+#[derive(Debug, PartialEq)]
+enum DebugMode {
+    Enabled,
+    Disabled,
+}
+
 struct Params {
     needed_x: i32,
     block_area_top: f32,
@@ -12,6 +18,7 @@ struct Params {
 }
 
 pub struct Dwarfing {
+    debug_mode: DebugMode,
     player: Player,
     blocks: Vec<Block>,
     params: Params,
@@ -33,6 +40,7 @@ impl Dwarfing {
         let last_row_y = block_area_top;
 
         Self {
+            debug_mode: DebugMode::Enabled,
             player,
             blocks,
             params: Params {
@@ -56,6 +64,11 @@ impl Dwarfing {
     pub fn draw(&self) {
         self.draw_blocks();
         self.draw_player();
+
+        if self.debug_mode == DebugMode::Enabled {
+            set_default_camera();
+            Self::draw_debug_info(&self.player, &self.blocks);
+        }
     }
 
     //
@@ -130,13 +143,27 @@ impl Dwarfing {
     fn draw_blocks(&self) {
         for block in &self.blocks {
             if !block.destroyed {
-                draw_rectangle(
-                    block.shape.x,
-                    block.shape.y,
-                    block.shape.size.x,
-                    block.shape.size.y,
-                    block.shape.color,
-                );
+                match self.debug_mode {
+                    DebugMode::Enabled => {
+                        draw_rectangle_lines(
+                            block.shape.x,
+                            block.shape.y,
+                            block.shape.size.x,
+                            block.shape.size.y,
+                            1.0,
+                            block.shape.color,
+                        );
+                    }
+                    DebugMode::Disabled => {
+                        draw_rectangle(
+                            block.shape.x,
+                            block.shape.y,
+                            block.shape.size.x,
+                            block.shape.size.y,
+                            block.shape.color,
+                        );
+                    }
+                }
             }
         }
     }

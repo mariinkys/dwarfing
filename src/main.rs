@@ -7,7 +7,7 @@ mod shape;
 
 fn window_conf() -> Conf {
     Conf {
-        window_title: String::from("MacroQUADNTS"),
+        window_title: String::from("Dwarfing"),
         fullscreen: true,
         window_resizable: false,
         window_width: 1024,
