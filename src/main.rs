@@ -3,6 +3,7 @@ use macroquad::prelude::*;
 mod block;
 mod dwarfing;
 mod player;
+mod resources;
 mod shape;
 
 fn window_conf() -> Conf {
@@ -12,14 +13,14 @@ fn window_conf() -> Conf {
         window_resizable: false,
         window_width: 1024,
         window_height: 800,
-        //icon: Some(icon::set()),
         ..Default::default()
     }
 }
 
 #[macroquad::main(window_conf)]
 async fn main() {
-    let mut game = dwarfing::Dwarfing::init();
+    set_pc_assets_folder("assets");
+    let mut game = dwarfing::Dwarfing::init().await;
 
     loop {
         clear_background(LIGHTGRAY);

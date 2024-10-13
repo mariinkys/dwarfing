@@ -1,6 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::{block::Block, player::Player, shape::Shape};
+use crate::{block::Block, player::Player, resources::Resources, shape::Shape};
 
 const GRAVITY: f32 = 200.0;
 const BLOCK_SIZE: f32 = 32.0;
@@ -25,14 +25,17 @@ pub struct Dwarfing {
 }
 
 impl Dwarfing {
-    pub fn init() -> Self {
-        let player = Player::new(Shape {
+    pub async fn init() -> Self {
+        let resources = Resources::new().await;
+
+        let player_shape = Shape {
             x: screen_width() / 2.0,
             y: 0.0,
             size: Vec2::splat(32.0),
             color: BLUE,
-        });
+        };
 
+        let player = Player::new(player_shape, resources.player_texture);
         let blocks = Vec::new();
 
         let needed_x = (screen_width() / BLOCK_SIZE).ceil() as i32;
@@ -40,7 +43,7 @@ impl Dwarfing {
         let last_row_y = block_area_top;
 
         Self {
-            debug_mode: DebugMode::Enabled,
+            debug_mode: DebugMode::Disabled,
             player,
             blocks,
             params: Params {
@@ -114,9 +117,12 @@ impl Dwarfing {
     }
 
     fn handle_input(&mut self) {
+        self.player.sprite.set_animation(0);
         if is_mouse_button_pressed(MouseButton::Left) {
+            self.player.sprite.set_animation(1);
             Self::destroy_touching_blocks(&mut self.blocks, &self.player);
         }
+        self.player.sprite.update();
     }
 
     fn handle_camera(&self) {
@@ -169,12 +175,29 @@ impl Dwarfing {
     }
 
     fn draw_player(&self) {
-        draw_rectangle(
+        //draw_rectangle(
+        //    self.player.shape.x,
+        //    self.player.shape.y,
+        //    self.player.shape.size.x,
+        //    self.player.shape.size.y,
+        //    self.player.shape.color,
+        //);
+
+        let frame = self.player.sprite.frame();
+
+        draw_texture_ex(
+            &self.player.texture,
             self.player.shape.x,
             self.player.shape.y,
-            self.player.shape.size.x,
-            self.player.shape.size.y,
-            self.player.shape.color,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(Vec2 {
+                    x: self.player.shape.size.x,
+                    y: self.player.shape.size.y,
+                }),
+                source: Some(frame.source_rect),
+                ..Default::default()
+            },
         );
     }
 
