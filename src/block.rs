@@ -3,6 +3,8 @@ use crate::shape::Shape;
 pub struct Block {
     pub shape: Shape,
     pub destroyed: bool,
+    // TODO: The block texture should be part of the block state
+    //pub texture: Texture2D,
 }
 
 impl Block {
@@ -10,6 +12,7 @@ impl Block {
         Self {
             shape,
             destroyed: false,
+            //texture,
         }
     }
 }

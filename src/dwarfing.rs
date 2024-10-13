@@ -19,6 +19,7 @@ struct Params {
 
 pub struct Dwarfing {
     debug_mode: DebugMode,
+    resources: Resources,
     player: Player,
     blocks: Vec<Block>,
     params: Params,
@@ -33,7 +34,7 @@ impl Dwarfing {
             color: BLUE,
         };
 
-        let player = Player::new(player_shape, resources.player_texture);
+        let player = Player::new(player_shape, resources.player_texture.clone());
         let blocks = Vec::new();
 
         let needed_x = (screen_width() / BLOCK_SIZE).ceil() as i32;
@@ -42,6 +43,7 @@ impl Dwarfing {
 
         Self {
             debug_mode: DebugMode::Disabled,
+            resources,
             player,
             blocks,
             params: Params {
@@ -159,12 +161,34 @@ impl Dwarfing {
                         );
                     }
                     DebugMode::Disabled => {
-                        draw_rectangle(
+                        //draw_rectangle(
+                        //    block.shape.x,
+                        //    block.shape.y,
+                        //    block.shape.size.x,
+                        //    block.shape.size.y,
+                        //    block.shape.color,
+                        //);
+
+                        draw_texture_ex(
+                            &self.resources.dirt_block_texture,
                             block.shape.x,
                             block.shape.y,
-                            block.shape.size.x,
-                            block.shape.size.y,
-                            block.shape.color,
+                            WHITE,
+                            DrawTextureParams {
+                                dest_size: Some(Vec2 {
+                                    x: block.shape.size.x,
+                                    y: block.shape.size.y,
+                                }),
+                                // TODO: Implement proper texture selecting based on block HP
+                                source: Some(Rect {
+                                    x: 32.0, // Column 1, of a 32x32
+                                    //x = 128.0, // Column 4, of a 32x32
+                                    y: 0.0,  // Row 0
+                                    w: 32.0, // Width of the frame
+                                    h: 32.0, // Height of the frame
+                                }),
+                                ..Default::default()
+                            },
                         );
                     }
                 }
@@ -210,12 +234,13 @@ impl Dwarfing {
 
     fn spawn_row_of_blocks(blocks: &mut Vec<Block>, needed_x: i32, y: f32) {
         for x in 0..needed_x {
-            blocks.push(Block::new(Shape {
+            let shape = Shape {
                 x: x as f32 * BLOCK_SIZE,
                 y,
                 size: Vec2::splat(BLOCK_SIZE),
                 color: RED,
-            }));
+            };
+            blocks.push(Block::new(shape));
         }
     }
 
