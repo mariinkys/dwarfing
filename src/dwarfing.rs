@@ -25,9 +25,7 @@ pub struct Dwarfing {
 }
 
 impl Dwarfing {
-    pub async fn init() -> Self {
-        let resources = Resources::new().await;
-
+    pub fn init(resources: Resources) -> Self {
         let player_shape = Shape {
             x: screen_width() / 2.0,
             y: 0.0,
