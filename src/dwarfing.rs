@@ -1,11 +1,6 @@
 use macroquad::prelude::*;
 
-use crate::{
-    block::{Block, BlockType},
-    player::Player,
-    resources::Resources,
-    shape::Shape,
-};
+use crate::{block::Block, player::Player, resources::Resources, shape::Shape};
 
 const GRAVITY: f32 = 500.0;
 const BLOCK_SIZE: f32 = 32.0;
