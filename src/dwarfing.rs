@@ -1,6 +1,11 @@
 use macroquad::prelude::*;
 
-use crate::{block::Block, player::Player, resources::Resources, shape::Shape};
+use crate::{
+    block::{Block, BlockType},
+    player::Player,
+    resources::Resources,
+    shape::Shape,
+};
 
 const GRAVITY: f32 = 500.0;
 const BLOCK_SIZE: f32 = 32.0;
@@ -110,7 +115,7 @@ impl Dwarfing {
     fn player_collision(&mut self) {
         // Collision detection and resolution
         for block in &self.blocks {
-            if !block.destroyed && Self::check_collision(&self.player.shape, &block.shape) {
+            if !block.is_destroyed() && Self::check_collision(&self.player.shape, &block.shape) {
                 Self::resolve_collision(&mut self.player, &block.shape, self.params.block_area_top);
             }
         }
@@ -148,7 +153,7 @@ impl Dwarfing {
 
     fn draw_blocks(&self) {
         for block in &self.blocks {
-            if !block.destroyed {
+            if !block.is_destroyed() {
                 match self.debug_mode {
                     DebugMode::Enabled => {
                         draw_rectangle_lines(
@@ -260,8 +265,15 @@ impl Dwarfing {
 
     fn destroy_touching_blocks(blocks: &mut [Block], player: &Player) {
         for block in blocks.iter_mut() {
-            if !block.destroyed && Self::check_collision(&player.shape, &block.shape) {
-                block.destroyed = true;
+            if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
+                match &mut block.block_type {
+                    BlockType::Dirt { hp } | BlockType::Rock { hp } => {
+                        *hp -= 10;
+                        if *hp < 0 {
+                            *hp = 0;
+                        }
+                    }
+                }
                 return; // Added a return so you only break one block per click
             }
         }
@@ -274,7 +286,7 @@ impl Dwarfing {
         );
         draw_text(player_text.as_str(), 10.0, 20.0, 20.0, BLACK);
 
-        let destroyed_blocks = blocks.iter().filter(|block| block.destroyed).count();
+        let destroyed_blocks = blocks.iter().filter(|block| block.is_destroyed()).count();
         let total_blocks = blocks.len();
         let block_text = format!(
             "Number of blocks = Alive:{} Destroyed:{} TOTAL:{}",
