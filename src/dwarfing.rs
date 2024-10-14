@@ -174,6 +174,7 @@ impl Dwarfing {
                         //    block.shape.color,
                         //);
 
+                        // TODO: Maybe the block texture should be part of the block state
                         draw_texture_ex(
                             &self.resources.dirt_block_texture,
                             block.shape.x,
@@ -184,7 +185,6 @@ impl Dwarfing {
                                     x: block.shape.size.x,
                                     y: block.shape.size.y,
                                 }),
-                                // TODO: Implement proper texture selecting based on block HP
                                 source: Some(block.texture_selector()),
                                 ..Default::default()
                             },
@@ -260,16 +260,7 @@ impl Dwarfing {
     fn destroy_touching_blocks(blocks: &mut [Block], player: &Player) {
         for block in blocks.iter_mut() {
             if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
-                match &mut block.block_type {
-                    // TODO: Maybe move this to block.rs?
-                    BlockType::Dirt { hp, base_hp: _ } | BlockType::Rock { hp, base_hp: _ } => {
-                        // TODO: Depending on the player upgrades we should subtract more or less hp?
-                        *hp -= 10;
-                        if *hp < 0 {
-                            *hp = 0;
-                        }
-                    }
-                }
+                block.subtract_block_hp();
                 return; // Added a return so you only break one block per click
             }
         }

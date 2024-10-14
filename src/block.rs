@@ -40,6 +40,18 @@ impl Block {
         }
     }
 
+    pub fn subtract_block_hp(&mut self) {
+        match &mut self.block_type {
+            BlockType::Dirt { hp, .. } | BlockType::Rock { hp, .. } => {
+                // TODO: Depending on the player upgrades we should subtract more or less hp?
+                *hp -= 10;
+                if *hp < 0 {
+                    *hp = 0;
+                }
+            }
+        }
+    }
+
     // Select the correct texture based on the block hp relative to the base hp
     pub fn texture_selector(&self) -> Rect {
         match &self.block_type {
