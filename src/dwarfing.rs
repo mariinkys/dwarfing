@@ -185,13 +185,7 @@ impl Dwarfing {
                                     y: block.shape.size.y,
                                 }),
                                 // TODO: Implement proper texture selecting based on block HP
-                                source: Some(Rect {
-                                    x: 32.0, // Column 1, of a 32x32
-                                    //x = 128.0, // Column 4, of a 32x32
-                                    y: 0.0,  // Row 0
-                                    w: 32.0, // Width of the frame
-                                    h: 32.0, // Height of the frame
-                                }),
+                                source: Some(block.texture_selector()),
                                 ..Default::default()
                             },
                         );
@@ -267,7 +261,9 @@ impl Dwarfing {
         for block in blocks.iter_mut() {
             if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
                 match &mut block.block_type {
-                    BlockType::Dirt { hp } | BlockType::Rock { hp } => {
+                    // TODO: Maybe move this to block.rs?
+                    BlockType::Dirt { hp, base_hp: _ } | BlockType::Rock { hp, base_hp: _ } => {
+                        // TODO: Depending on the player upgrades we should subtract more or less hp?
                         *hp -= 10;
                         if *hp < 0 {
                             *hp = 0;
