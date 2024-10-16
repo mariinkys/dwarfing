@@ -128,11 +128,15 @@ impl Dwarfing {
     }
 
     fn handle_input(&mut self) {
-        self.player.sprite.set_animation(0);
-        if is_mouse_button_pressed(MouseButton::Left) {
+        if is_mouse_button_down(MouseButton::Left) {
             self.player.sprite.set_animation(1);
-            Self::destroy_touching_blocks(&mut self.blocks, &self.player);
+            if is_mouse_button_pressed(MouseButton::Left) {
+                Self::destroy_touching_blocks(&mut self.blocks, &self.player);
+            }
+        } else {
+            self.player.sprite.set_animation(0);
         }
+
         self.player.sprite.update();
     }
 
