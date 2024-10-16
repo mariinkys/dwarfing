@@ -1,5 +1,5 @@
 use macroquad::{
-    audio::{stop_sound, Sound},
+    audio::Sound,
     prelude::*,
     ui::{hash, root_ui},
 };
@@ -57,14 +57,14 @@ fn menu_ui(button_sound: &Sound) -> GameState {
             let play_button_x = (window_width - button_width) / 2.0;
             let play_button_y = start_y + label_height + vertical_spacing;
             if ui.button(vec2(play_button_x, play_button_y), "Play") {
-                macroquad::audio::play_sound_once(&button_sound);
+                macroquad::audio::play_sound_once(button_sound);
                 state = GameState::Playing;
             }
 
             let quit_button_x = (window_width - button_width) / 2.0;
             let quit_button_y = play_button_y + button_height + vertical_spacing;
             if ui.button(vec2(quit_button_x, quit_button_y), "Quit") {
-                macroquad::audio::play_sound_once(&button_sound);
+                macroquad::audio::play_sound_once(button_sound);
                 std::process::exit(0);
             }
         },
