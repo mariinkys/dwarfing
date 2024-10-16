@@ -1,5 +1,5 @@
 use ::rand::Rng;
-use macroquad::prelude::*;
+use macroquad::{audio::stop_sound, prelude::*};
 
 use crate::{
     block::{Block, BlockType},
@@ -18,6 +18,12 @@ enum DebugMode {
     Disabled,
 }
 
+#[derive(Debug, PartialEq)]
+enum PlayingThemeAudio {
+    OpeningTheme,
+    GameTheme,
+}
+
 struct Params {
     needed_x: i32,
     block_area_top: f32,
@@ -27,6 +33,7 @@ struct Params {
 pub struct Dwarfing {
     debug_mode: DebugMode,
     score: Score,
+    playing_theme: PlayingThemeAudio,
     resources: Resources,
     player: Player,
     blocks: Vec<Block>,
@@ -51,9 +58,12 @@ impl Dwarfing {
         let block_area_top = screen_height() / 2.0;
         let last_row_y = block_area_top;
 
+        let playing_theme = PlayingThemeAudio::OpeningTheme;
+
         Self {
             debug_mode: DebugMode::Disabled,
             score,
+            playing_theme,
             resources,
             player,
             blocks,
@@ -66,6 +76,7 @@ impl Dwarfing {
     }
 
     pub fn update(&mut self) {
+        self.init_music();
         self.apply_gravity();
         self.update_player_position();
         self.update_blocks();
@@ -377,5 +388,19 @@ impl Dwarfing {
             total_blocks
         );
         draw_text(block_text.as_str(), 10.0, 45.0, 20.0, BLACK);
+    }
+
+    fn init_music(&mut self) {
+        if self.playing_theme == PlayingThemeAudio::OpeningTheme {
+            self.playing_theme = PlayingThemeAudio::GameTheme;
+            stop_sound(&self.resources.opening_theme);
+            macroquad::audio::play_sound(
+                &self.resources.game_theme,
+                macroquad::audio::PlaySoundParams {
+                    looped: true,
+                    volume: 0.5,
+                },
+            );
+        }
     }
 }

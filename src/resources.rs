@@ -1,4 +1,5 @@
 use macroquad::{
+    audio::{load_sound, Sound},
     color::WHITE,
     math::RectOffset,
     texture::{build_textures_atlas, load_image, load_texture, FilterMode, Image, Texture2D},
@@ -17,6 +18,11 @@ pub struct Resources {
     pub menu_background: Image,
     pub button_background: Image,
     pub button_clicked_background: Image,
+
+    // Sounds
+    pub opening_theme: Sound,
+    pub start_button_sound: Sound,
+    pub game_theme: Sound,
 }
 
 impl Resources {
@@ -51,6 +57,11 @@ impl Resources {
             .await
             .unwrap();
 
+        // Sounds
+        let opening_theme = load_sound("sounds/opening-theme.ogg").await.unwrap();
+        let start_button_sound = load_sound("sounds/button-game-start.ogg").await.unwrap();
+        let game_theme = load_sound("sounds/game-theme.ogg").await.unwrap();
+
         Self {
             player_texture,
             dirt_block_texture,
@@ -59,6 +70,9 @@ impl Resources {
             menu_background,
             button_background,
             button_clicked_background,
+            opening_theme,
+            start_button_sound,
+            game_theme,
         }
     }
 

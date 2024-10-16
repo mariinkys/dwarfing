@@ -1,4 +1,5 @@
 use macroquad::{
+    audio::{stop_sound, Sound},
     prelude::*,
     ui::{hash, root_ui},
 };
@@ -30,7 +31,7 @@ fn window_conf() -> Conf {
     }
 }
 
-fn menu_ui() -> GameState {
+fn menu_ui(button_sound: &Sound) -> GameState {
     let mut state = GameState::Menu;
 
     let window_width = screen_width();
@@ -56,12 +57,14 @@ fn menu_ui() -> GameState {
             let play_button_x = (window_width - button_width) / 2.0;
             let play_button_y = start_y + label_height + vertical_spacing;
             if ui.button(vec2(play_button_x, play_button_y), "Play") {
+                macroquad::audio::play_sound_once(&button_sound);
                 state = GameState::Playing;
             }
 
             let quit_button_x = (window_width - button_width) / 2.0;
             let quit_button_y = play_button_y + button_height + vertical_spacing;
             if ui.button(vec2(quit_button_x, quit_button_y), "Quit") {
+                macroquad::audio::play_sound_once(&button_sound);
                 std::process::exit(0);
             }
         },
@@ -74,6 +77,15 @@ async fn main() {
     set_pc_assets_folder("assets");
 
     let resources = Resources::new().await;
+
+    let button_sound = resources.start_button_sound.clone();
+    macroquad::audio::play_sound(
+        &resources.opening_theme,
+        macroquad::audio::PlaySoundParams {
+            looped: true,
+            volume: 1.,
+        },
+    );
     resources.clone().build_ui(); // TODO: Can I avoid cloning here?
 
     let mut game_state = GameState::Menu;
@@ -84,7 +96,7 @@ async fn main() {
 
         match game_state {
             GameState::Menu => {
-                game_state = menu_ui();
+                game_state = menu_ui(&button_sound);
             }
             GameState::Playing => {
                 game.update();
