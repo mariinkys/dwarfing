@@ -1,4 +1,4 @@
-use ::rand::Rng;
+use macroquad::rand::rand;
 use macroquad::{audio::stop_sound, prelude::*};
 
 use crate::{
@@ -320,8 +320,7 @@ impl Dwarfing {
             };
 
             // TODO: This should be initialaized with the game and kept in the game state?
-            let mut rng = ::rand::thread_rng();
-            let rng_num = rng.gen::<f32>();
+            let rng_num = rand() as f32 / u32::MAX as f32;
 
             let block_type = if rng_num < gold_probability {
                 BlockType::Gold {
