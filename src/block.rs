@@ -1,4 +1,4 @@
-use macroquad::math::Rect;
+use macroquad::{math::Rect, texture::Texture2D};
 
 use crate::shape::Shape;
 
@@ -6,29 +6,28 @@ pub enum BlockType {
     Dirt {
         base_hp: i32,
         hp: i32,
-        // TODO: Maybe the texture should be set here?
-        //texture: Texture2D
+        texture: Texture2D,
     },
     Rock {
         base_hp: i32,
         hp: i32,
+        texture: Texture2D,
     },
 }
 
 pub struct Block {
     pub shape: Shape,
     pub block_type: BlockType,
-    // TODO: The block texture should be part of the block state
-    //pub texture: Texture2D,
 }
 
 impl Block {
-    pub fn new(shape: Shape) -> Self {
+    pub fn new(shape: Shape, texture: Texture2D) -> Self {
         Self {
             shape,
             block_type: BlockType::Dirt {
                 base_hp: 50,
                 hp: 50,
+                texture,
             },
             //texture,
         }
@@ -36,7 +35,16 @@ impl Block {
 
     pub fn is_destroyed(&self) -> bool {
         match &self.block_type {
-            BlockType::Dirt { hp, base_hp: _ } | BlockType::Rock { hp, base_hp: _ } => *hp <= 0,
+            BlockType::Dirt {
+                hp,
+                base_hp: _,
+                texture: _,
+            }
+            | BlockType::Rock {
+                hp,
+                base_hp: _,
+                texture: _,
+            } => *hp <= 0,
         }
     }
 
@@ -55,7 +63,7 @@ impl Block {
     // Select the correct texture based on the block hp relative to the base hp
     pub fn texture_selector(&self) -> Rect {
         match &self.block_type {
-            BlockType::Dirt { hp, base_hp } | BlockType::Rock { hp, base_hp } => {
+            BlockType::Dirt { hp, base_hp, .. } | BlockType::Rock { hp, base_hp, .. } => {
                 let hp_percentage = (*hp as f32 / *base_hp as f32) * 100.0;
                 let column = if hp_percentage >= 75.0 {
                     1

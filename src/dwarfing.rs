@@ -97,7 +97,12 @@ impl Dwarfing {
         // Generate new blocks if needed
         if self.player.shape.y + screen_height() > self.params.last_row_y {
             let new_row_y = self.params.last_row_y + BLOCK_SIZE;
-            Self::spawn_row_of_blocks(&mut self.blocks, self.params.needed_x, new_row_y);
+            Self::spawn_row_of_blocks(
+                &mut self.blocks,
+                self.params.needed_x,
+                new_row_y,
+                &self.resources,
+            );
             self.params.last_row_y = new_row_y;
         }
     }
@@ -169,9 +174,21 @@ impl Dwarfing {
                         //    block.shape.color,
                         //);
 
-                        // TODO: Maybe the block texture should be part of the block state
+                        let texture = match &block.block_type {
+                            crate::block::BlockType::Dirt {
+                                base_hp: _,
+                                hp: _,
+                                texture,
+                            } => texture,
+                            crate::block::BlockType::Rock {
+                                base_hp: _,
+                                hp: _,
+                                texture,
+                            } => texture,
+                        };
+
                         draw_texture_ex(
-                            &self.resources.dirt_block_texture,
+                            texture,
                             block.shape.x,
                             block.shape.y,
                             WHITE,
@@ -226,7 +243,7 @@ impl Dwarfing {
     // HELPERS
     //
 
-    fn spawn_row_of_blocks(blocks: &mut Vec<Block>, needed_x: i32, y: f32) {
+    fn spawn_row_of_blocks(blocks: &mut Vec<Block>, needed_x: i32, y: f32, resources: &Resources) {
         for x in 0..needed_x {
             let shape = Shape {
                 x: x as f32 * BLOCK_SIZE,
@@ -234,7 +251,11 @@ impl Dwarfing {
                 size: Vec2::splat(BLOCK_SIZE),
                 color: RED,
             };
-            blocks.push(Block::new(shape));
+
+            // TODO, Can I avoid cloning?
+            let texture = resources.dirt_block_texture.clone();
+
+            blocks.push(Block::new(shape, texture));
         }
     }
 
