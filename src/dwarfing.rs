@@ -1,6 +1,12 @@
+use ::rand::Rng;
 use macroquad::prelude::*;
 
-use crate::{block::Block, player::Player, resources::Resources, shape::Shape};
+use crate::{
+    block::{Block, BlockType},
+    player::Player,
+    resources::Resources,
+    shape::Shape,
+};
 
 const GRAVITY: f32 = 500.0;
 const BLOCK_SIZE: f32 = 32.0;
@@ -185,6 +191,11 @@ impl Dwarfing {
                                 hp: _,
                                 texture,
                             } => texture,
+                            crate::block::BlockType::Gold {
+                                base_hp: _,
+                                hp: _,
+                                texture,
+                            } => texture,
                         };
 
                         draw_texture_ex(
@@ -252,10 +263,43 @@ impl Dwarfing {
                 color: RED,
             };
 
-            // TODO, Can I avoid cloning?
-            let texture = resources.dirt_block_texture.clone();
+            // TODO: Move this to a helper function
+            // Select a Random Block
+            let dynamic_rock_cap = (0.3 + (0.001 * (y - 1000.0).max(0.0))).min(0.8); // Cap increases after y = 1000, maxing at 80%
+            let rock_probability = (0.01 * y.ln()).min(dynamic_rock_cap); // Rock probability increases with depth
 
-            blocks.push(Block::new(shape, texture));
+            let dynamic_gold_cap = (0.02 + (0.001 * (y - 2000.0).max(0.0))).min(0.2); // Cap increases slowly, maxing at 20%
+            let gold_probability = if y > 2000.0 {
+                (0.002 * (y - 2000.0).ln()).min(dynamic_gold_cap) // Gold probability increases after y = 2000
+            } else {
+                0.0 // No gold above y = 2000
+            };
+
+            // TODO: This should be initialaized with the game and kept in the game state?
+            let mut rng = ::rand::thread_rng();
+            let rng_num = rng.gen::<f32>();
+
+            let block_type = if rng_num < gold_probability {
+                BlockType::Gold {
+                    base_hp: 100,
+                    hp: 100,
+                    texture: resources.gold_block_texture.clone(), // TODO: Can I avoid cloning the textures?
+                }
+            } else if rng_num < (rock_probability + gold_probability) {
+                BlockType::Rock {
+                    base_hp: 70,
+                    hp: 70,
+                    texture: resources.rock_block_texture.clone(),
+                }
+            } else {
+                BlockType::Dirt {
+                    base_hp: 50,
+                    hp: 50,
+                    texture: resources.dirt_block_texture.clone(),
+                }
+            };
+
+            blocks.push(Block::new(shape, block_type));
         }
     }
 

@@ -10,6 +10,8 @@ pub struct Resources {
     // Textures
     pub player_texture: Texture2D,
     pub dirt_block_texture: Texture2D,
+    pub rock_block_texture: Texture2D,
+    pub gold_block_texture: Texture2D,
 
     // Images
     pub menu_background: Image,
@@ -29,6 +31,16 @@ impl Resources {
             .expect("Can't load dirt block texture");
         dirt_block_texture.set_filter(FilterMode::Nearest);
 
+        let rock_block_texture: Texture2D = load_texture("blocks/stone.png")
+            .await
+            .expect("Can't load rock block texture");
+        dirt_block_texture.set_filter(FilterMode::Nearest);
+
+        let gold_block_texture: Texture2D = load_texture("blocks/gold.png")
+            .await
+            .expect("Can't load gold block texture");
+        dirt_block_texture.set_filter(FilterMode::Nearest);
+
         // This will ensure that all calls to draw_texture() and draw_texture_ex() will use the texture from the atlas instead of each separate texture,
         // which is much more efficient. All textures need to be loaded before this function is called.
         build_textures_atlas();
@@ -42,6 +54,8 @@ impl Resources {
         Self {
             player_texture,
             dirt_block_texture,
+            rock_block_texture,
+            gold_block_texture,
             menu_background,
             button_background,
             button_clicked_background,
