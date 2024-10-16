@@ -1,6 +1,6 @@
 use macroquad::{math::Rect, texture::Texture2D};
 
-use crate::shape::Shape;
+use crate::{score::Score, shape::Shape};
 
 pub enum BlockType {
     Dirt {
@@ -50,16 +50,18 @@ impl Block {
         }
     }
 
-    pub fn subtract_block_hp(&mut self) {
+    pub fn subtract_block_hp(&mut self) -> bool {
         match &mut self.block_type {
             BlockType::Dirt { hp, .. }
             | BlockType::Rock { hp, .. }
             | BlockType::Gold { hp, .. } => {
                 // TODO: Depending on the player upgrades we should subtract more or less hp?
                 *hp -= 10;
-                if *hp < 0 {
+                if *hp <= 0 {
                     *hp = 0;
+                    return true;
                 }
+                false
             }
         }
     }
@@ -96,6 +98,33 @@ impl Block {
                     w: 32.0,                       // Width of the frame
                     h: 32.0,                       // Height of the frame
                 }
+            }
+        }
+    }
+
+    pub fn update_score(&self, score: &mut Score) {
+        score.blocks_destroyed += 1;
+        match self.block_type {
+            BlockType::Dirt {
+                base_hp: _,
+                hp: _,
+                texture: _,
+            } => {
+                score.current_score += 1;
+            }
+            BlockType::Rock {
+                base_hp: _,
+                hp: _,
+                texture: _,
+            } => {
+                score.current_score += 3;
+            }
+            BlockType::Gold {
+                base_hp: _,
+                hp: _,
+                texture: _,
+            } => {
+                score.current_score += 10;
             }
         }
     }

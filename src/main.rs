@@ -8,6 +8,7 @@ mod block;
 mod dwarfing;
 mod player;
 mod resources;
+mod score;
 mod shape;
 
 const WINDOW_SIZE_X: i32 = 1056;

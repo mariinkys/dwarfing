@@ -5,6 +5,7 @@ use crate::{
     block::{Block, BlockType},
     player::Player,
     resources::Resources,
+    score::Score,
     shape::Shape,
 };
 
@@ -25,6 +26,7 @@ struct Params {
 
 pub struct Dwarfing {
     debug_mode: DebugMode,
+    score: Score,
     resources: Resources,
     player: Player,
     blocks: Vec<Block>,
@@ -40,6 +42,8 @@ impl Dwarfing {
             color: BLUE,
         };
 
+        let score = Score::init();
+
         let player = Player::new(player_shape, resources.player_texture.clone());
         let blocks = Vec::new();
 
@@ -49,6 +53,7 @@ impl Dwarfing {
 
         Self {
             debug_mode: DebugMode::Disabled,
+            score,
             resources,
             player,
             blocks,
@@ -74,10 +79,11 @@ impl Dwarfing {
         self.draw_blocks();
         self.draw_player();
 
+        set_default_camera();
         if self.debug_mode == DebugMode::Enabled {
-            set_default_camera();
             Self::draw_debug_info(&self.player, &self.blocks);
         }
+        self.draw_ui();
     }
 
     //
@@ -131,7 +137,7 @@ impl Dwarfing {
         if is_mouse_button_down(MouseButton::Left) {
             self.player.sprite.set_animation(1);
             if is_mouse_button_pressed(MouseButton::Left) {
-                Self::destroy_touching_blocks(&mut self.blocks, &self.player);
+                Self::destroy_touching_blocks(&mut self.blocks, &self.player, &mut self.score);
             }
         } else {
             self.player.sprite.set_animation(0);
@@ -254,6 +260,28 @@ impl Dwarfing {
         }
     }
 
+    fn draw_ui(&self) {
+        let score_text = format!("Score = {}", &self.score.current_score);
+        draw_text(
+            score_text.as_str(),
+            screen_width() - 10.0 - measure_text(score_text.as_str(), None, 20, 1.0).width,
+            20.0,
+            20.0,
+            BLACK,
+        );
+
+        let destroyed_blocks_text = format!("Destroyed Blocks = {}", &self.score.blocks_destroyed);
+        draw_text(
+            destroyed_blocks_text.as_str(),
+            screen_width()
+                - 10.0
+                - measure_text(destroyed_blocks_text.as_str(), None, 20, 1.0).width,
+            45.0,
+            20.0,
+            BLACK,
+        );
+    }
+
     //
     // HELPERS
     //
@@ -321,10 +349,13 @@ impl Dwarfing {
         }
     }
 
-    fn destroy_touching_blocks(blocks: &mut [Block], player: &Player) {
+    fn destroy_touching_blocks(blocks: &mut [Block], player: &Player, score: &mut Score) {
         for block in blocks.iter_mut() {
             if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
-                block.subtract_block_hp();
+                let block_destroyed = block.subtract_block_hp();
+                if block_destroyed {
+                    block.update_score(score);
+                }
                 return; // Added a return so you only break one block per click
             }
         }
