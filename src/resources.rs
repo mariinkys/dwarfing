@@ -23,6 +23,7 @@ pub struct Resources {
     pub opening_theme: Sound,
     pub start_button_sound: Sound,
     pub game_theme: Sound,
+    pub pickaxe_sound: Sound,
 }
 
 impl Resources {
@@ -61,6 +62,7 @@ impl Resources {
         let opening_theme = load_sound("sounds/opening-theme.ogg").await.unwrap();
         let start_button_sound = load_sound("sounds/button-game-start.ogg").await.unwrap();
         let game_theme = load_sound("sounds/game-theme.ogg").await.unwrap();
+        let pickaxe_sound = load_sound("sounds/pickaxe.ogg").await.unwrap();
 
         Self {
             player_texture,
@@ -73,6 +75,7 @@ impl Resources {
             opening_theme,
             start_button_sound,
             game_theme,
+            pickaxe_sound,
         }
     }
 

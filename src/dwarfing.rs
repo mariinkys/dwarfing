@@ -148,6 +148,7 @@ impl Dwarfing {
         if is_mouse_button_down(MouseButton::Left) {
             self.player.sprite.set_animation(1);
             if is_mouse_button_pressed(MouseButton::Left) {
+                Self::play_low_sound_once(&self.resources.pickaxe_sound);
                 Self::destroy_touching_blocks(&mut self.blocks, &self.player, &mut self.score);
             }
         } else {
@@ -402,5 +403,15 @@ impl Dwarfing {
                 },
             );
         }
+    }
+
+    fn play_low_sound_once(sound: &macroquad::audio::Sound) {
+        macroquad::audio::play_sound(
+            sound,
+            macroquad::audio::PlaySoundParams {
+                looped: false,
+                volume: 0.2,
+            },
+        );
     }
 }
