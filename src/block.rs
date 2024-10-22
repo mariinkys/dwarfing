@@ -111,6 +111,7 @@ impl Block {
                 texture: _,
             } => {
                 score.current_score += 1;
+                score.gold += 1;
             }
             BlockType::Rock {
                 base_hp: _,
@@ -118,6 +119,7 @@ impl Block {
                 texture: _,
             } => {
                 score.current_score += 3;
+                score.gold += 3;
             }
             BlockType::Gold {
                 base_hp: _,
@@ -125,6 +127,7 @@ impl Block {
                 texture: _,
             } => {
                 score.current_score += 10;
+                score.gold += 10;
             }
         }
     }

@@ -297,6 +297,15 @@ impl Dwarfing {
             destroyed_blocks_text.as_str(),
         );
 
+        let gold_text = format!("Gold = {}", &self.score.gold);
+        macroquad::ui::root_ui().label(
+            Vec2::new(
+                screen_width() - 10.0 - measure_text(gold_text.as_str(), None, 28, 1.0).width,
+                60.0,
+            ),
+            gold_text.as_str(),
+        );
+
         if macroquad::ui::root_ui().button(
             Vec2::new(screen_width() - 170.0, screen_height() - 100.0),
             String::from("Shop"),
@@ -316,13 +325,15 @@ impl Dwarfing {
                         self.is_shop_open = false;
                     }
 
+                    // TODO: Int's of price... should not be hard-coded like this?
                     macroquad::ui::widgets::Group::new(hash!("first_upgrade"), vec2(320., 80.)).ui(
                         ui,
                         |ui| {
                             ui.label(Vec2::splat(10.), "Iron Pickaxe");
-                            ui.label(vec2(230., 10.), "Price: 50");
-                            if ui.button(vec2(10., 40.), "Buy") {
+                            ui.label(vec2(200., 10.), "Price: 50 Gold");
+                            if self.score.gold >= 50 && ui.button(vec2(10., 40.), "Buy") {
                                 self.player.current_pickaxe = Pickaxe::Iron;
+                                self.score.gold -= 50;
                             }
                         },
                     );
@@ -330,9 +341,10 @@ impl Dwarfing {
                     macroquad::ui::widgets::Group::new(hash!("second_upgrade"), vec2(320., 80.))
                         .ui(ui, |ui| {
                             ui.label(Vec2::splat(10.), "Gold Pickaxe");
-                            ui.label(vec2(230., 10.), "Price: 150");
-                            if ui.button(vec2(10., 40.), "Buy") {
+                            ui.label(vec2(200., 10.), "Price: 150 Gold");
+                            if self.score.gold >= 150 && ui.button(vec2(10., 40.), "Buy") {
                                 self.player.current_pickaxe = Pickaxe::Gold;
+                                self.score.gold -= 150;
                             }
                         });
                 });
@@ -407,7 +419,14 @@ impl Dwarfing {
     fn destroy_touching_blocks(blocks: &mut [Block], player: &Player, score: &mut Score) {
         for block in blocks.iter_mut() {
             if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
-                let block_destroyed = block.subtract_block_hp(10);
+                // TODO: Move this logic to a more reasonable location? Int's Should not be hard-coded like this?
+                let hp_to_subtract = match player.current_pickaxe {
+                    Pickaxe::Normal => 10,
+                    Pickaxe::Iron => 25,
+                    Pickaxe::Gold => 50,
+                };
+
+                let block_destroyed = block.subtract_block_hp(hp_to_subtract);
                 if block_destroyed {
                     block.update_score(score);
                 }
