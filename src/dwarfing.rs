@@ -1,6 +1,8 @@
 use macroquad::rand::rand;
+use macroquad::ui::hash;
 use macroquad::{audio::stop_sound, prelude::*};
 
+use crate::player::Pickaxe;
 use crate::{
     block::{Block, BlockType},
     player::Player,
@@ -38,6 +40,7 @@ pub struct Dwarfing {
     player: Player,
     blocks: Vec<Block>,
     params: Params,
+    is_shop_open: bool,
 }
 
 impl Dwarfing {
@@ -72,6 +75,7 @@ impl Dwarfing {
                 block_area_top,
                 last_row_y,
             },
+            is_shop_open: false,
         }
     }
 
@@ -86,7 +90,7 @@ impl Dwarfing {
         self.handle_camera();
     }
 
-    pub fn draw(&self) {
+    pub fn draw(&mut self) {
         self.draw_blocks();
         self.draw_player();
 
@@ -272,26 +276,67 @@ impl Dwarfing {
         }
     }
 
-    fn draw_ui(&self) {
+    fn draw_ui(&mut self) {
         let score_text = format!("Score = {}", &self.score.current_score);
-        draw_text(
+        macroquad::ui::root_ui().label(
+            Vec2::new(
+                screen_width() - 10.0 - measure_text(score_text.as_str(), None, 28, 1.0).width,
+                10.0,
+            ),
             score_text.as_str(),
-            screen_width() - 10.0 - measure_text(score_text.as_str(), None, 20, 1.0).width,
-            20.0,
-            20.0,
-            BLACK,
         );
 
         let destroyed_blocks_text = format!("Destroyed Blocks = {}", &self.score.blocks_destroyed);
-        draw_text(
+        macroquad::ui::root_ui().label(
+            Vec2::new(
+                screen_width()
+                    - 10.0
+                    - measure_text(destroyed_blocks_text.as_str(), None, 28, 1.0).width,
+                35.0,
+            ),
             destroyed_blocks_text.as_str(),
-            screen_width()
-                - 10.0
-                - measure_text(destroyed_blocks_text.as_str(), None, 20, 1.0).width,
-            45.0,
-            20.0,
-            BLACK,
         );
+
+        if macroquad::ui::root_ui().button(
+            Vec2::new(screen_width() - 170.0, screen_height() - 100.0),
+            String::from("Shop"),
+        ) {
+            self.is_shop_open = true;
+        }
+
+        if self.is_shop_open {
+            macroquad::ui::root_ui().pop_skin(); // TODO
+            macroquad::ui::widgets::Window::new(hash!(), vec2(400., 200.), vec2(320., 400.))
+                .label("Shop")
+                .close_button(false)
+                .titlebar(false)
+                .movable(false)
+                .ui(&mut macroquad::ui::root_ui(), |ui| {
+                    if ui.button(Vec2::new(10., 10.), "Close") {
+                        self.is_shop_open = false;
+                    }
+
+                    macroquad::ui::widgets::Group::new(hash!("first_upgrade"), vec2(320., 80.)).ui(
+                        ui,
+                        |ui| {
+                            ui.label(Vec2::splat(10.), "Iron Pickaxe");
+                            ui.label(vec2(230., 10.), "Price: 50");
+                            if ui.button(vec2(10., 40.), "Buy") {
+                                self.player.current_pickaxe = Pickaxe::Iron;
+                            }
+                        },
+                    );
+
+                    macroquad::ui::widgets::Group::new(hash!("second_upgrade"), vec2(320., 80.))
+                        .ui(ui, |ui| {
+                            ui.label(Vec2::splat(10.), "Gold Pickaxe");
+                            ui.label(vec2(230., 10.), "Price: 150");
+                            if ui.button(vec2(10., 40.), "Buy") {
+                                self.player.current_pickaxe = Pickaxe::Gold;
+                            }
+                        });
+                });
+        }
     }
 
     //
@@ -319,7 +364,6 @@ impl Dwarfing {
                 0.0 // No gold above y = 2000
             };
 
-            // TODO: This should be initialaized with the game and kept in the game state?
             let rng_num = rand() as f32 / u32::MAX as f32;
 
             let block_type = if rng_num < gold_probability {
@@ -363,7 +407,7 @@ impl Dwarfing {
     fn destroy_touching_blocks(blocks: &mut [Block], player: &Player, score: &mut Score) {
         for block in blocks.iter_mut() {
             if !block.is_destroyed() && Self::check_collision(&player.shape, &block.shape) {
-                let block_destroyed = block.subtract_block_hp();
+                let block_destroyed = block.subtract_block_hp(10);
                 if block_destroyed {
                     block.update_score(score);
                 }

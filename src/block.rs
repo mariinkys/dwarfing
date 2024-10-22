@@ -50,13 +50,13 @@ impl Block {
         }
     }
 
-    pub fn subtract_block_hp(&mut self) -> bool {
+    pub fn subtract_block_hp(&mut self, hp_to_subtract: i32) -> bool {
         match &mut self.block_type {
             BlockType::Dirt { hp, .. }
             | BlockType::Rock { hp, .. }
             | BlockType::Gold { hp, .. } => {
                 // TODO: Depending on the player upgrades we should subtract more or less hp?
-                *hp -= 10;
+                *hp -= hp_to_subtract;
                 if *hp <= 0 {
                     *hp = 0;
                     return true;

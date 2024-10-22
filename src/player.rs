@@ -7,10 +7,17 @@ use crate::shape::Shape;
 
 const MOVEMENT_SPEED: f32 = 1.0;
 
+pub enum Pickaxe {
+    Normal,
+    Iron,
+    Gold,
+}
+
 pub struct Player {
     pub shape: Shape,
     pub speed: f32,
     pub offset_y: f32, // Add this field to track vertical offset, to fix gravity jankiness
+    pub current_pickaxe: Pickaxe,
 
     pub texture: Texture2D,
     pub sprite: AnimatedSprite,
@@ -46,6 +53,7 @@ impl Player {
             offset_y: 0.0,
             sprite,
             texture,
+            current_pickaxe: Pickaxe::Normal,
         }
     }
 }
