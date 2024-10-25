@@ -366,10 +366,16 @@ impl Dwarfing {
     }
 
     fn draw_background(&self) {
+        let background_y = if self.player.shape.y <= screen_height() {
+            0.0 // Keep background fixed at top when player is in upper half
+        } else {
+            self.player.shape.y - screen_height() / 2. // Scroll background when player is lower
+        };
+
         draw_texture(
             &self.resources.game_background_texture,
-            self.player.shape.x - screen_width() / 2.0, // Since camera targets player x
-            self.player.shape.y - screen_height() / 2.0, // Since camera targets player y
+            0.,
+            background_y,
             WHITE,
         );
     }

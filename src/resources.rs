@@ -36,12 +36,12 @@ impl Resources {
             .expect("Can't load player texture");
         player_texture_basic.set_filter(FilterMode::Nearest);
 
-        let player_texture_iron: Texture2D = load_texture("sprites/player_basic.png")
+        let player_texture_iron: Texture2D = load_texture("sprites/player_iron.png")
             .await
             .expect("Can't load player texture");
         player_texture_iron.set_filter(FilterMode::Nearest);
 
-        let player_texture_gold: Texture2D = load_texture("sprites/player_basic.png")
+        let player_texture_gold: Texture2D = load_texture("sprites/player_gold.png")
             .await
             .expect("Can't load player texture");
         player_texture_gold.set_filter(FilterMode::Nearest);
@@ -61,7 +61,7 @@ impl Resources {
             .expect("Can't load gold block texture");
         dirt_block_texture.set_filter(FilterMode::Nearest);
 
-        let game_background_texture: Texture2D = load_texture("resources/main_menu_bg.png")
+        let game_background_texture: Texture2D = load_texture("resources/game_bg.png")
             .await
             .expect("Can't load gold block texture");
         game_background_texture.set_filter(FilterMode::Nearest);
