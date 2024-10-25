@@ -1,5 +1,5 @@
 use macroquad::rand::rand;
-use macroquad::ui::hash;
+use macroquad::ui::{hash, root_ui};
 use macroquad::{audio::stop_sound, prelude::*};
 
 use crate::player::Pickaxe;
@@ -11,7 +11,7 @@ use crate::{
     shape::Shape,
 };
 
-const GRAVITY: f32 = 500.0;
+const GRAVITY: f32 = 800.0;
 const BLOCK_SIZE: f32 = 32.0;
 
 #[derive(Debug, PartialEq)]
@@ -54,7 +54,7 @@ impl Dwarfing {
 
         let score = Score::init();
 
-        let player = Player::new(player_shape, resources.player_texture.clone());
+        let player = Player::new(player_shape, resources.player_texture_basic.clone());
         let blocks = Vec::new();
 
         let needed_x = (screen_width() / BLOCK_SIZE).ceil() as i32;
@@ -91,6 +91,7 @@ impl Dwarfing {
     }
 
     pub fn draw(&mut self) {
+        self.draw_background(); // TODO: tbh I should not make the background like this.
         self.draw_blocks();
         self.draw_player();
 
@@ -314,7 +315,9 @@ impl Dwarfing {
         }
 
         if self.is_shop_open {
-            macroquad::ui::root_ui().pop_skin(); // TODO
+            //let window_skin = macroquad::ui::root_ui().default_skin();
+            //root_ui().push_skin(&window_skin);
+            root_ui().pop_skin(); // TODO
             macroquad::ui::widgets::Window::new(hash!(), vec2(400., 200.), vec2(320., 400.))
                 .label("Shop")
                 .close_button(false)
@@ -331,8 +334,13 @@ impl Dwarfing {
                         |ui| {
                             ui.label(Vec2::splat(10.), "Iron Pickaxe");
                             ui.label(vec2(200., 10.), "Price: 50 Gold");
-                            if self.score.gold >= 50 && ui.button(vec2(10., 40.), "Buy") {
+                            if self.score.gold >= 50
+                                && self.player.current_pickaxe != Pickaxe::Iron
+                                && ui.button(vec2(10., 40.), "Buy")
+                            {
                                 self.player.current_pickaxe = Pickaxe::Iron;
+                                self.player
+                                    .swap_texture(self.resources.player_texture_iron.clone());
                                 self.score.gold -= 50;
                             }
                         },
@@ -342,13 +350,28 @@ impl Dwarfing {
                         .ui(ui, |ui| {
                             ui.label(Vec2::splat(10.), "Gold Pickaxe");
                             ui.label(vec2(200., 10.), "Price: 150 Gold");
-                            if self.score.gold >= 150 && ui.button(vec2(10., 40.), "Buy") {
+                            if self.score.gold >= 150
+                                && self.player.current_pickaxe != Pickaxe::Gold
+                                && ui.button(vec2(10., 40.), "Buy")
+                            {
                                 self.player.current_pickaxe = Pickaxe::Gold;
+                                self.player
+                                    .swap_texture(self.resources.player_texture_gold.clone());
                                 self.score.gold -= 150;
                             }
                         });
                 });
+            //root_ui().pop_skin();
         }
+    }
+
+    fn draw_background(&self) {
+        draw_texture(
+            &self.resources.game_background_texture,
+            self.player.shape.x - screen_width() / 2.0, // Since camera targets player x
+            self.player.shape.y - screen_height() / 2.0, // Since camera targets player y
+            WHITE,
+        );
     }
 
     //

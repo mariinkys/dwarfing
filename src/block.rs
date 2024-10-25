@@ -55,7 +55,6 @@ impl Block {
             BlockType::Dirt { hp, .. }
             | BlockType::Rock { hp, .. }
             | BlockType::Gold { hp, .. } => {
-                // TODO: Depending on the player upgrades we should subtract more or less hp?
                 *hp -= hp_to_subtract;
                 if *hp <= 0 {
                     *hp = 0;

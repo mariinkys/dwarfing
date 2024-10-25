@@ -7,6 +7,7 @@ use crate::shape::Shape;
 
 const MOVEMENT_SPEED: f32 = 1.0;
 
+#[derive(PartialEq)]
 pub enum Pickaxe {
     Normal,
     Iron,
@@ -55,5 +56,9 @@ impl Player {
             texture,
             current_pickaxe: Pickaxe::Normal,
         }
+    }
+
+    pub fn swap_texture(&mut self, texture: Texture2D) {
+        self.texture = texture;
     }
 }
