@@ -27,6 +27,7 @@ Also thank you to my gf for the game idea and pixel art.
 There are many things that I did not have time to do / implement.
 
 - Fix the game UI
+- Why can I see the background behind the blocks?
 - Various code improvements
 - Add some kind of enemy that chases you
 - Upgrades that let you use some kind of ability

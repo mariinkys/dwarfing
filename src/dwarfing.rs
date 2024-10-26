@@ -172,7 +172,7 @@ impl Dwarfing {
         });
 
         // Fix the Y axis flipping and re-center the camera
-        camera.zoom = vec2(1. / screen_width() * 2., 1. / screen_height() * 2.);
+        camera.zoom = vec2(1. / screen_width() * 4., 1. / screen_height() * 4.);
 
         // Manually center the camera on the middle of the screen
         camera.target = vec2(screen_width() / 2.0, self.player.shape.y);
