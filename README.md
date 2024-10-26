@@ -26,10 +26,11 @@ Also thank you to my gf for the game idea and pixel art.
 
 There are many things that I did not have time to do / implement.
 
+- Fix the game UI
 - Various code improvements
 - Add some kind of enemy that chases you
 - Upgrades that let you use some kind of ability
 
 Also, just to comment about Macroquad and my experience using it, I've found it really enjoyable to use even with no prior "real" game
 development experience, if I had to say what caused me the most trouble apart from my severe lack of knowledge, I would probably say
-the UI, specifically the use of different skins throughout the game.
+the UI, specifically the use of different skins throughout the game (which I still cannot figure out).
